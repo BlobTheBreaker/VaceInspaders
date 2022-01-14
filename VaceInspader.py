@@ -1,6 +1,8 @@
 # Custom made Space Invader type game
 
 """
+TO DO LIST:
+
 x Ship canon
 x Alien grid
 x Alien bullet (shoot at random time, from random alien)
