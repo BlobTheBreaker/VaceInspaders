@@ -59,6 +59,7 @@ ALIEN_BULLET = pygame.transform.scale(ALIEN_BULLET_IMAGE, (ALIEN_BULLET_WIDTH, A
 # Sounds
 pygame.mixer.init()
 LASER_NOISE = pygame.mixer.Sound(os.path.join('Assets', 'laser.mp3'))
+EXPLOSION = pygame.mixer.Sound(os.path.join('Assets', 'brr.mp3'))
 
 # Other settings
 BACKGROUND_SPEED = 3 # px
@@ -222,6 +223,7 @@ def main():
                 if l.colliderect(a):
                     aliens.remove(a)
                     lasers.remove(l)
+                    pygame.mixer.Sound.play(EXPLOSION)
                     continue
 
             l.y -= LASER_SPEED # Laser progression
