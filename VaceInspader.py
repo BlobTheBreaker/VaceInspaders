@@ -28,14 +28,14 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
 # Background image
-# BACKGROUND = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'alien_2.png'))
-BACKGROUND_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'background.jpg'))
+# BACKGROUND = pygame.image.load(os.path.join('Assets', 'alien_2.png'))
+BACKGROUND_IMAGE = pygame.image.load(os.path.join('Assets', 'background.jpg'))
 BACKGROUND = pygame.transform.rotate(BACKGROUND_IMAGE, 90)
 BACKGROUND_WIDTH, BACKGROUND_HEIGHT = BACKGROUND.get_size()
 BACKGROUND_START_W, BACKGROUND_START_H = (-(BACKGROUND_WIDTH - WIDTH)//2, -(BACKGROUND_HEIGHT - HEIGHT)//2)
 
 # Win text
-YOU_WIN_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'you_win.png'))
+YOU_WIN_IMAGE = pygame.image.load(os.path.join('Assets', 'you_win.png'))
 YOU_WIN_RATIO = YOU_WIN_IMAGE.get_size()[0] / YOU_WIN_IMAGE.get_size()[1]
 YOU_WIN = pygame.transform.scale(YOU_WIN_IMAGE, (WIDTH//2, (WIDTH//2) // YOU_WIN_RATIO))
 
@@ -46,19 +46,19 @@ SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT = 20, 60
 ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT = 20, 30
 
 # Sprites
-SHIP_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'ship.png'))
+SHIP_IMAGE = pygame.image.load(os.path.join('Assets', 'ship.png'))
 SHIP = pygame.transform.scale(SHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT))
-ALIEN_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'alien.png'))
+ALIEN_IMAGE = pygame.image.load(os.path.join('Assets', 'alien.png'))
 ALIEN = pygame.transform.scale(ALIEN_IMAGE, (ALIEN_WIDTH, ALIEN_HEIGHT))
-SHIP_LASER_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'ship_laser.png'))
+SHIP_LASER_IMAGE = pygame.image.load(os.path.join('Assets', 'ship_laser.png'))
 # Laser's height and width are inverted here because of the rotation
 SHIP_LASER = pygame.transform.rotate(pygame.transform.scale(SHIP_LASER_IMAGE, (SHIP_LASER_HEIGHT, SHIP_LASER_WIDTH)), 90)
-ALIEN_BULLET_IMAGE = pygame.image.load(os.path.join('SpaceInvader', 'Assets', 'alien_bullet.png'))
+ALIEN_BULLET_IMAGE = pygame.image.load(os.path.join('Assets', 'alien_bullet.png'))
 ALIEN_BULLET = pygame.transform.scale(ALIEN_BULLET_IMAGE, (ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT))
 
 # Sounds
 pygame.mixer.init()
-# LASER_NOISE = pygame.mixer.Sound(os.path.join('SpaceInvader', 'Assets', 'son_laser.mp3'))
+LASER_NOISE = pygame.mixer.Sound(os.path.join('Assets', 'laser.mp3'))
 
 # Other settings
 BACKGROUND_SPEED = 3 # px
@@ -88,7 +88,7 @@ def shoot_laser(ship, lasers): # Will not shoot more than 3 lasers at a time, on
         l = pygame.Rect(ship.x + SHIP_WIDTH//2 - SHIP_LASER_WIDTH//2,
          ship.y - SHIP_LASER_HEIGHT,
          SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT)
-        # pygame.mixer.Sound.play(LASER_NOISE)
+        pygame.mixer.Sound.play(LASER_NOISE)
         lasers.append(l)
 
 # Aliens initial setup
