@@ -8,10 +8,12 @@ x Alien grid
 x Alien bullet (shoot at random time, from random alien)
 x End screen
 - Different Alien Sprites (or just different colors)
-- Sound Effects
+/ Sound Effects
+- Add lives
+- Add bullet/ship collision
+- Add Score
 """
 
-from pickle import TRUE
 import pygame
 import os
 import random
@@ -130,7 +132,7 @@ def draw_screen(background, ship, aliens, lasers, bullets, running):
     pygame.display.update()
 
     if not running:
-        wait = TRUE
+        wait = True
         while wait:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
