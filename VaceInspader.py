@@ -9,11 +9,12 @@ x Alien bullet (shoot at random time, from random alien)
 x End screen
 - Different Alien Sprites (or just different colors)
 / Sound Effects
-- Add lives
-- Add bullet/ship collision
+x Add lives
+x Add bullet/ship collision
 - Add Score
 """
 
+from base64 import encode
 import pygame
 import os
 import random
@@ -81,6 +82,8 @@ WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN.fill(BLACK)
 pygame.display.set_caption('Vace Inspaders')
 pygame.display.set_icon(SHIP)
+pygame.font.init()
+txt_font = pygame.font.SysFont('Times New Romans', 25)
 
 # Ship Firing function
 lasers = []
@@ -114,8 +117,9 @@ def fire_bullet(alien):
     bullets.append(b)
 
 # Screen updating function
-def draw_screen(background, ship, aliens, lasers, bullets, running):
-    WIN.fill(BLACK)
+def draw_screen(background, ship, aliens, lasers, bullets, running, lives):
+    lives_display = txt_font.render('LIVES: ' + str(lives), False, WHITE)
+    
     WIN.blit(BACKGROUND, (background.x, background.y % BACKGROUND_HEIGHT))
     WIN.blit(BACKGROUND, (background.x, (background.y % BACKGROUND_HEIGHT) - BACKGROUND_HEIGHT))
     WIN.blit(SHIP, (ship.x, ship.y))
@@ -126,6 +130,7 @@ def draw_screen(background, ship, aliens, lasers, bullets, running):
     for b in bullets:
         WIN.blit(ALIEN_BULLET, (b.x, b.y))
 
+    WIN.blit(lives_display, (10, 10))
     if not running:
         WIN.blit(YOU_WIN, ((WIDTH - YOU_WIN.get_width())//2, (HEIGHT - YOU_WIN.get_height())//2))
 
@@ -154,6 +159,7 @@ def main():
     last_move = 0
     last_bullet = 0
     bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
+    lives = 3
 
     # Game Loop
     running = True
@@ -190,8 +196,6 @@ def main():
             last_bullet = pygame.time.get_ticks()
             bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
 
-        for b in bullets:
-            b.y += LASER_SPEED
 
         # Alien movements
         if pygame.time.get_ticks() - last_move > alien_speed:
@@ -215,7 +219,8 @@ def main():
             last_move = pygame.time.get_ticks()
 
         
-        # Projectiles movements
+    # Projectiles movements
+        # Ship lasers
         for l in lasers: # Out of bounds
             if l.y + SHIP_LASER_HEIGHT == 0:
                 lasers.remove(l)
@@ -230,9 +235,21 @@ def main():
 
             l.y -= LASER_SPEED # Laser progression
 
+        # Alien Bullets
+        for b in bullets:
+            if b.colliderect(ship):
+                lives -= 1
+                bullets.remove(b)
+
+            if lives == 0:
+                running = False
+                continue
+
+            b.y += LASER_SPEED
+
         background.y += BACKGROUND_SPEED # Scrolls background
-        draw_screen(background, ship, aliens, lasers, bullets, running) # Update screen
-    draw_screen(background, ship, aliens, lasers, bullets, running)
+        draw_screen(background, ship, aliens, lasers, bullets, running, lives) # Update screen
+    draw_screen(background, ship, aliens, lasers, bullets, running, lives) # End of game
 
 
 if __name__ == '__main__':
