@@ -11,10 +11,10 @@ x End screen
 / Sound Effects
 x Add lives
 x Add bullet/ship collision
-- Add Score
+- Add score
+x Add alien/ship collision
 """
 
-from base64 import encode
 import pygame
 import os
 import random
@@ -199,6 +199,12 @@ def main():
 
         # Alien movements
         if pygame.time.get_ticks() - last_move > alien_speed:
+            # Alien touches the ship
+            for a in aliens:
+                if a.colliderect(ship):
+                    running = False
+                    continue
+
             # Last alien decides of the bounce on screen border
             if max(map(lambda x: x.x, aliens)) + ALIEN_WIDTH + alien_step > WIDTH:
                 alien_step *= -1
