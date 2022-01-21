@@ -11,4 +11,4 @@ msg = ''
 while msg != 'exit': # Communication loop with disconnection option
     msg = input('Send to server: ') 
     print(n.send(msg)) # "Print the response the server gave you when you sent this" 
-                                                                    # -This Line
+                                                                # -This Line

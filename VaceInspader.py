@@ -108,6 +108,7 @@ def place_aliens(nb_lines):
 
     return aliens
 
+
 # Alien bullet firing function
 bullets = []
 def fire_bullet(alien):

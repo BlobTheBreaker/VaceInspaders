@@ -53,4 +53,4 @@ while True: # Loop accepting the requests
     """
 
     start_new_thread(threaded_client, (conn, client_id))
-    client_id += 1 # Generate new token for the next client
+    client_id += 1 # Generate new token for the next client.

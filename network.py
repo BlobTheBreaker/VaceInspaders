@@ -19,3 +19,4 @@ class Network():
         self.sock.send(str(msg).encode()) # Any type that can make a str, gets encoded and sent
         data = self.sock.recv(2048).decode('UTF-8')  # Gets the server's response, decodes it
         return data # and returns it
+
