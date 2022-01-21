@@ -42,6 +42,11 @@ YOU_WIN_IMAGE = pygame.image.load(os.path.join('Assets', 'you_win.png'))
 YOU_WIN_RATIO = YOU_WIN_IMAGE.get_size()[0] / YOU_WIN_IMAGE.get_size()[1]
 YOU_WIN = pygame.transform.scale(YOU_WIN_IMAGE, (WIDTH//2, (WIDTH//2) // YOU_WIN_RATIO))
 
+# Lose text
+YOU_LOSE_IMAGE = pygame.image.load(os.path.join('Assets', 'you_lose.png'))
+YOU_LOSE_RATIO = YOU_LOSE_IMAGE.get_size()[0] / YOU_LOSE_IMAGE.get_size()[1]
+YOU_LOSE = pygame.transform.scale(YOU_LOSE_IMAGE, (WIDTH//2, (WIDTH//2) // YOU_LOSE_RATIO))
+
 # Sprite sizes
 SHIP_WIDTH, SHIP_HEIGHT = 60, 60
 ALIEN_WIDTH, ALIEN_HEIGHT = 40, 30
@@ -54,7 +59,7 @@ SHIP = pygame.transform.scale(SHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT))
 ALIEN_IMAGE = pygame.image.load(os.path.join('Assets', 'alien.png'))
 ALIEN = pygame.transform.scale(ALIEN_IMAGE, (ALIEN_WIDTH, ALIEN_HEIGHT))
 SHIP_LASER_IMAGE = pygame.image.load(os.path.join('Assets', 'ship_laser.png'))
-# Laser's height and width are inverted here because of the rotation
+# Laser's height and width are inverted here because of the 90 deg anti-clockwise rotation
 SHIP_LASER = pygame.transform.rotate(pygame.transform.scale(SHIP_LASER_IMAGE, (SHIP_LASER_HEIGHT, SHIP_LASER_WIDTH)), 90)
 ALIEN_BULLET_IMAGE = pygame.image.load(os.path.join('Assets', 'alien_bullet.png'))
 ALIEN_BULLET = pygame.transform.scale(ALIEN_BULLET_IMAGE, (ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT))
@@ -117,7 +122,7 @@ def fire_bullet(alien):
     bullets.append(b)
 
 # Screen updating function
-def draw_screen(background, ship, aliens, lasers, bullets, running, lives):
+def draw_screen(background, ship, aliens, lasers, bullets, lives, end_state):
     lives_display = txt_font.render('LIVES: ' + str(lives), False, WHITE)
     
     WIN.blit(BACKGROUND, (background.x, background.y % BACKGROUND_HEIGHT))
@@ -131,12 +136,14 @@ def draw_screen(background, ship, aliens, lasers, bullets, running, lives):
         WIN.blit(ALIEN_BULLET, (b.x, b.y))
 
     WIN.blit(lives_display, (10, 10))
-    if not running:
+    if end_state == 'win':
         WIN.blit(YOU_WIN, ((WIDTH - YOU_WIN.get_width())//2, (HEIGHT - YOU_WIN.get_height())//2))
+    elif end_state == 'lose':
+        WIN.blit(YOU_LOSE, ((WIDTH - YOU_LOSE.get_width())//2, (HEIGHT - YOU_LOSE.get_height())//2))
 
     pygame.display.update()
 
-    if not running:
+    if end_state == 'win' or end_state == 'lose':
         wait = True
         while wait:
             for event in pygame.event.get():
@@ -160,6 +167,7 @@ def main():
     last_bullet = 0
     bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
     lives = 3
+    end_state = ''
 
     # Game Loop
     running = True
@@ -175,6 +183,7 @@ def main():
 
         if len(aliens) == 0:
             running = False
+            end_state = 'win'
             continue
 
         # Ship movements
@@ -249,13 +258,15 @@ def main():
 
             if lives == 0:
                 running = False
+                end_state = 'lose'
                 continue
 
             b.y += LASER_SPEED
 
         background.y += BACKGROUND_SPEED # Scrolls background
-        draw_screen(background, ship, aliens, lasers, bullets, running, lives) # Update screen
-    draw_screen(background, ship, aliens, lasers, bullets, running, lives) # End of game
+        draw_screen(background, ship, aliens, lasers, bullets, lives, end_state) # Update screen
+    
+    draw_screen(background, ship, aliens, lasers, bullets, lives, end_state) # End of game
 
 
 if __name__ == '__main__':
