@@ -11,6 +11,7 @@ x End screen
 / Sound Effects
 x Add lives
 x Add bullet/ship collision
+- Add score
 x Add alien/ship collision
 """
 
