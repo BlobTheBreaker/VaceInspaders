@@ -22,7 +22,7 @@ except:
 
 def threaded_client(conn, client_id):  # This enables multiple clients to be handled at once
     
-    conn.send('Hello Client {0}'.format(client_id).encode()) # Sends a visual confirmation of the connection
+    conn.send(str(client_id).encode()) # Sends a player number token
 
     while True: # Communication loop between the client and the server
             data = conn.recv(2048).decode('UTF-8') # receive 2048 bytes at a time, decodes binary to text

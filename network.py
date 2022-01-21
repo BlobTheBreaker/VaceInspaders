@@ -12,8 +12,8 @@ class Network():
     def connect(self): # Handles the connection to the server
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect(self.adress)
-        data = self.sock.recv(2048).decode('UTF-8') # Receives the client token
-        print(data) # Only prints it for now
+        return self.sock.recv(2048).decode('UTF-8') # Receives the client token
+        
 
     def send(self, msg): # Sends to the server
         self.sock.send(str(msg).encode()) # Any type that can make a str, gets encoded and sent

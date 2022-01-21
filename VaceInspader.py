@@ -13,11 +13,14 @@ x Add lives
 x Add bullet/ship collision
 - Add score
 x Add alien/ship collision
+
+Network
 """
 
 import pygame
 import os
 import random
+from network import Network
 
 # Screen size
 WIDTH = 600
@@ -54,8 +57,8 @@ SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT = 20, 60
 ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT = 20, 30
 
 # Sprites
-SHIP_IMAGE = pygame.image.load(os.path.join('Assets', 'ship.png'))
-SHIP = pygame.transform.scale(SHIP_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT))
+SHIP1_IMAGE = pygame.image.load(os.path.join('Assets', 'ship.png'))
+SHIP1 = pygame.transform.scale(SHIP1_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT))
 ALIEN_IMAGE = pygame.image.load(os.path.join('Assets', 'alien.png'))
 ALIEN = pygame.transform.scale(ALIEN_IMAGE, (ALIEN_WIDTH, ALIEN_HEIGHT))
 SHIP_LASER_IMAGE = pygame.image.load(os.path.join('Assets', 'ship_laser.png'))
@@ -73,7 +76,7 @@ EXPLOSION = pygame.mixer.Sound(os.path.join('Assets', 'brr.mp3'))
 BACKGROUND_SPEED = 3 # px
 SHIP_SPEED = 5 # px
 MAX_LASERS = 3
-LASER_SPEED = 5 # px
+LASER1_SPEED = 5 # px
 LASER_DELAY = 300 # ms
 ALIEN_SPEED = 800 # ms
 ALIEN_STEP = ALIEN_WIDTH//2 # px
@@ -86,7 +89,7 @@ LEVEL = 4
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 WIN.fill(BLACK)
 pygame.display.set_caption('Vace Inspaders')
-pygame.display.set_icon(SHIP)
+pygame.display.set_icon(SHIP1)
 pygame.font.init()
 txt_font = pygame.font.SysFont('Times New Romans', 25)
 
@@ -128,7 +131,7 @@ def draw_screen(background, ship, aliens, lasers, bullets, lives, end_state):
     
     WIN.blit(BACKGROUND, (background.x, background.y % BACKGROUND_HEIGHT))
     WIN.blit(BACKGROUND, (background.x, (background.y % BACKGROUND_HEIGHT) - BACKGROUND_HEIGHT))
-    WIN.blit(SHIP, (ship.x, ship.y))
+    WIN.blit(SHIP1, (ship.x, ship.y))
     for a in aliens:
         WIN.blit(ALIEN, (a.x, a.y))
     for l in lasers:
@@ -249,7 +252,7 @@ def main():
                     pygame.mixer.Sound.play(EXPLOSION)
                     continue
 
-            l.y -= LASER_SPEED # Laser progression
+            l.y -= LASER1_SPEED # Laser progression
 
         # Alien Bullets
         for b in bullets:
@@ -262,7 +265,7 @@ def main():
                 end_state = 'lose'
                 continue
 
-            b.y += LASER_SPEED
+            b.y += LASER1_SPEED
 
         background.y += BACKGROUND_SPEED # Scrolls background
         draw_screen(background, ship, aliens, lasers, bullets, lives, end_state) # Update screen

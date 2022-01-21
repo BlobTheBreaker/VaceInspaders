@@ -21,3 +21,11 @@ Implementing a basic networking setup. To test, run the server script, then run 
 The goal is to implement some kind of pvp over the internet (by gettin someone to run the server and giving his external IP to another consenting adult ;) ) to learn more about sockets and threads.
 
 I was following a tutorial which used _thread which i hear is now deprecated. It is what i am using right now as i am not yet so knowledgeable about threads yet.
+
+
+21/01/2022:
+Creation of the PvPVaceInspader.py file to work on the pvp version without breaking the original game.
+
+- Started defining classes to clarify the code
+- Imported Network to have a n instance as an attribute for the player
+- Added a second ship surface rotated 180 deg for ennemy player
