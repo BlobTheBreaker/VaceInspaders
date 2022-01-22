@@ -15,11 +15,8 @@ x Add bullet/ship collision
 x Add alien/ship collision
 
 Network Version:
-/ Refactor the code into OOP (classes)
-- Have the player connect to the server
-- Laser / ship collision through server
-- End of game condition
-- 
+
+- Make everything OOP...
 """
 
 import pygame
@@ -64,9 +61,6 @@ ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT = 20, 30
 # Sprites
 SHIP1_IMAGE = pygame.image.load(os.path.join('Assets', 'ship.png'))
 SHIP1 = pygame.transform.scale(SHIP1_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT))
-SHIP2_IMAGE = pygame.image.load(os.path.join('Assets', 'ship.png'))
-SHIP2 = pygame.transform.rotate(pygame.transform.scale(SHIP2_IMAGE, (SHIP_WIDTH, SHIP_HEIGHT)), 180)
-# Ship 2 will be displayed from top down
 ALIEN_IMAGE = pygame.image.load(os.path.join('Assets', 'alien.png'))
 ALIEN = pygame.transform.scale(ALIEN_IMAGE, (ALIEN_WIDTH, ALIEN_HEIGHT))
 SHIP_LASER_IMAGE = pygame.image.load(os.path.join('Assets', 'ship_laser.png'))
@@ -85,8 +79,13 @@ BACKGROUND_SPEED = 3 # px
 SHIP_SPEED = 5 # px
 MAX_LASERS = 3
 LASER1_SPEED = 5 # px
-LASER2_SPEED = -5 # px (since it shoots from top down)
 LASER_DELAY = 300 # ms
+ALIEN_SPEED = 800 # ms
+ALIEN_STEP = ALIEN_WIDTH//2 # px
+ALIEN_PADDING = int(1.5 * ALIEN_WIDTH) # px
+MIN_BULLET_WAIT = 800
+MAX_BULLET_WAIT = 2000
+LEVEL = 4
 
 # Window Setup
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -96,60 +95,17 @@ pygame.display.set_icon(SHIP1)
 pygame.font.init()
 txt_font = pygame.font.SysFont('Times New Romans', 25)
 
-# Networking setup
-n = Network() # Create a default Network obj which will connect to a server run from the same computer
-player_id = n.connect() # Establishing connection
-
-# This time, we will use classes cause... the other code is a mess.
-# The player class will handle the local player's and the ennemy's ships differently in subclasses
-class Player():
-    def __init__(self, player_id=None, n=None):
-        self.lasers = []
-        # Both ships will be playing from the bottom of the screen
-        self.rect = pygame.Rect(WIDTH//2 - SHIP_WIDTH//2, HEIGHT - 10 - SHIP_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT)
-        
-
-# The LocalPlayer class will have more functionnalities that the EnnemyPlayer class doesn't need
-# (because the ennemy will be handled by the other client using an instance of the LocalPlayer)
-class LocalPlayer(Player):
-    def __init__(self, player_id=None, n=None):
-        super().__init__(player_id, n)
-        self.player_id = player_id
-        self.n = n
-        self.lives = 3
-        self.ship_img = SHIP1
-        self.last_laser = 0
-        
-
-    # Ship firing method
-    def shoot_laser(self, clock): # Will not shoot more than 3 lasers at a time, one at a second
-        if len(self.lasers) >= MAX_LASERS and pygame.time.get_ticks() - self.last_laser < LASER_DELAY:
-            return
-        else:
-            l = Laser(self.rect.x, self.rect.y) # we pass the ship's position to create the laser
-            l.noise()
-            self.lasers.append(l)
-
-
-# Ennemy ship's class is mostly a shell containing it's position, lives and lasers for representation
-class EnnemyPlayer(Player):
-    def __init__(self):
-        super().__init__()
-        self.ship_img = SHIP2 # Upside down ship
-
-
-# Laser class will handle movements, collisions and sound
-class Laser():
-    def __init__(self, ship_x, ship_y):
-        self.rect = pygame.Rect(ship_x + SHIP_WIDTH//2 - SHIP_LASER_WIDTH//2,
-                    ship_y - SHIP_LASER_HEIGHT,
-                    SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT)
-
-    def noise():
+# Ship Firing function
+lasers = []
+def shoot_laser(ship, lasers): # Will not shoot more than 3 lasers at a time, one at a second
+    if len(lasers) >= MAX_LASERS:
+        return
+    else:
+        l = pygame.Rect(ship.x + SHIP_WIDTH//2 - SHIP_LASER_WIDTH//2,
+         ship.y - SHIP_LASER_HEIGHT,
+         SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT)
         pygame.mixer.Sound.play(LASER_NOISE)
-
-"""
-Alien functions not used in this version for now...
+        lasers.append(l)
 
 # Aliens initial setup
 def place_aliens(nb_lines):
@@ -170,7 +126,7 @@ def fire_bullet(alien):
     b = pygame.Rect(alien.x + ALIEN_WIDTH//2 - ALIEN_BULLET_WIDTH//2,
      alien.y + ALIEN_HEIGHT, ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT)
     bullets.append(b)
-"""
+
 # Screen updating function
 def draw_screen(background, ship, aliens, lasers, bullets, lives, end_state):
     lives_display = txt_font.render('LIVES: ' + str(lives), False, WHITE)
@@ -207,7 +163,15 @@ r_gen = random.Random()
 
 def main():
     # Initialization
+    ship = pygame.Rect(WIDTH//2 - SHIP_WIDTH//2, HEIGHT - 10 - SHIP_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT)
+    aliens = place_aliens(LEVEL)
+    alien_speed = ALIEN_SPEED
+    alien_step = ALIEN_STEP
     background = pygame.Rect(BACKGROUND_START_W, BACKGROUND_START_H, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+    last_laser = 0
+    last_move = 0
+    last_bullet = 0
+    bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
     lives = 3
     end_state = ''
 
