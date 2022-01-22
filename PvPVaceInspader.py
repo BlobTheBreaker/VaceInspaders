@@ -118,10 +118,12 @@ class LocalPlayer(Player):
         self.n = n
         self.lives = 3
         self.ship_img = SHIP1
+        self.last_laser = 0
+        
 
     # Ship firing method
-    def shoot_laser(self): # Will not shoot more than 3 lasers at a time, one at a second
-        if len(self.lasers) >= MAX_LASERS:
+    def shoot_laser(self, clock): # Will not shoot more than 3 lasers at a time, one at a second
+        if len(self.lasers) >= MAX_LASERS and pygame.time.get_ticks() - self.last_laser < LASER_DELAY:
             return
         else:
             l = Laser(self.rect.x, self.rect.y) # we pass the ship's position to create the laser
@@ -133,6 +135,7 @@ class LocalPlayer(Player):
 class EnnemyPlayer(Player):
     def __init__(self):
         super().__init__()
+        self.ship_img = SHIP2 # Upside down ship
 
 
 # Laser class will handle movements, collisions and sound
@@ -204,9 +207,7 @@ r_gen = random.Random()
 
 def main():
     # Initialization
-    ship = pygame.Rect(WIDTH//2 - SHIP_WIDTH//2, HEIGHT - 10 - SHIP_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT)
     background = pygame.Rect(BACKGROUND_START_W, BACKGROUND_START_H, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-    last_laser = 0
     lives = 3
     end_state = ''
 
