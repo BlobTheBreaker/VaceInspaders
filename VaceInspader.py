@@ -20,7 +20,6 @@ Network
 import pygame
 import os
 import random
-from network import Network
 
 # Screen size
 WIDTH = 600

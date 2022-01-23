@@ -24,6 +24,12 @@ def threaded_client(conn, client_id):  # This enables multiple clients to be han
     
     conn.send(str(client_id).encode()) # Sends a player number token
 
+    while not (client_data[0] == 'ready' and client_data[1] == 'ready'): # Waiting on both players to be ready
+        client_data[client_id] = conn.recv(2048).decode('UTF-8')
+        conn.sendall(b'not ready')
+
+    conn.sendall(b'ready') # Start the game
+
     while True: # Communication loop between the client and the server
             data = conn.recv(2048).decode('UTF-8') # receive 2048 bytes at a time, decodes binary to text
             if data == 'exit': # Disconnection condition
@@ -38,19 +44,12 @@ def threaded_client(conn, client_id):  # This enables multiple clients to be han
 
 
 sock.listen(2) # Tells the socket to listen for up to 2 connection requests
-client_id = 1 # The token identifying each individual client
+client_data = ['', '']
+client_id = 0 # The token identifying each individual client
 
-while True: # Loop accepting the requests
+while True <= 1: # Loop accepting the requests
     conn, addr = sock.accept() # accept() returns the connection and the ip:port of the client
 
     print('Connected by {0}:{1}'.format(addr[0], addr[1]))
-
-    """
-    Here, we hand over the connection to each client to a different subprocess with the function 
-    'start_new_process', which will run the function 'threaded_client' with the arguments in the tuple.
-    This subprocess will output in the same terminal as Server.py but will allow the server accepting
-    requests and each individual server-client exchange to happen simultaneously.
-    """
-
     start_new_thread(threaded_client, (conn, client_id))
     client_id += 1 # Generate new token for the next client.

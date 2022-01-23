@@ -3,26 +3,15 @@
 """
 TO DO LIST:
 
-x Ship canon
-x Alien grid
-x Alien bullet (shoot at random time, from random alien)
-x End screen
-- Different Alien Sprites (or just different colors)
-/ Sound Effects
-x Add lives
-x Add bullet/ship collision
-- Add score
-x Add alien/ship collision
+OOP Version:
 
-Network Version:
-
-- Make everything OOP...
+x Make everything OOP...
+- Start networking part!
 """
 
 import pygame
 import os
 import random
-from network import Network
 
 # Screen size
 WIDTH = 600

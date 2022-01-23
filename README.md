@@ -10,6 +10,36 @@ Controls are left/right/space.
 
 LOGS:
 
+23/01/2022:
+The client connects to the server and waits for another client to connect to launch the game.
+I discovered, while coding the server side, that threading creates 2 separate subrocesses that
+share the same namespaces. This was, it is easy to have clients communicate with each other **almost**
+simultaneously
+
+- Connected to server and synchronized game start
+- Did packing and unpacking of informations
+- Did Ennemy class to represent the other player
+
+I realize that the server might only act as a bridge for now. I will move some game functionnalities
+to the server side eventually to lighten the weight on the client side.
+
+
+22/01/2022:
+After 3 attempts at refactoring, realized that this process has to be very procedural and slow paced: you create one class,
+make it's __init__ and test it. Then add a couple methods and test it. Then you move on to another class.
+
+- The code is now fully (from what i understand of it) OOP
+- Now is the time to add some networking to it!
+
+
+21/01/2022:
+Creation of the PvPVaceInspader.py file to work on the pvp version without breaking the original game.
+
+- Started defining classes to clarify the code
+- Imported Network to have a n instance as an attribute for the player
+- Added a second ship surface rotated 180 deg for ennemy player
+
+
 20/01/2022:
 The game has 1 level, some sound effects, Winning and Losing ending.
 
@@ -22,17 +52,3 @@ The goal is to implement some kind of pvp over the internet (by gettin someone t
 
 I was following a tutorial which used _thread which i hear is now deprecated. It is what i am using right now as i am not yet so knowledgeable about threads yet.
 
-
-21/01/2022:
-Creation of the PvPVaceInspader.py file to work on the pvp version without breaking the original game.
-
-- Started defining classes to clarify the code
-- Imported Network to have a n instance as an attribute for the player
-- Added a second ship surface rotated 180 deg for ennemy player
-
-22/01/2022:
-After 3 attempts at refactoring, realized that this process has to be very procedural and slow paced: you create one class,
-make it's __init__ and test it. Then add a couple methods and test it. Then you move on to another class.
-
-- The code is now fully (from what i understand of it) OOP
-- Now is the time to add some networking to it!
