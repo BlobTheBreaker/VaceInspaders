@@ -1,7 +1,7 @@
 # VaceInspaders
 
 First attempt at a game coded in python using pygame.
-My focus is not the playability of looks of the game but more the mechanics surrounding it.
+My focus is not the playability or looks of the game but more the mechanics surrounding it.
 Feel free to suggest any improvements that would make me learn something new while doing it ;)
 
 Controls are left/right/space.
