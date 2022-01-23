@@ -87,193 +87,299 @@ MIN_BULLET_WAIT = 800
 MAX_BULLET_WAIT = 2000
 LEVEL = 4
 
-# Window Setup
-WIN = pygame.display.set_mode((WIDTH, HEIGHT))
-WIN.fill(BLACK)
-pygame.display.set_caption('Vace Inspaders')
-pygame.display.set_icon(SHIP1)
-pygame.font.init()
-txt_font = pygame.font.SysFont('Times New Romans', 25)
-
-# Ship Firing function
-lasers = []
-def shoot_laser(ship, lasers): # Will not shoot more than 3 lasers at a time, one at a second
-    if len(lasers) >= MAX_LASERS:
-        return
-    else:
-        l = pygame.Rect(ship.x + SHIP_WIDTH//2 - SHIP_LASER_WIDTH//2,
-         ship.y - SHIP_LASER_HEIGHT,
-         SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT)
-        pygame.mixer.Sound.play(LASER_NOISE)
-        lasers.append(l)
-
-# Aliens initial setup
-def place_aliens(nb_lines):
-    aliens = []
-    aliens_per_line = WIDTH//(ALIEN_WIDTH + ALIEN_PADDING) - 1
-    for line in range(nb_lines):
-        for alien in range(aliens_per_line):
-            aliens.append(pygame.Rect(alien * (ALIEN_PADDING + ALIEN_WIDTH),
-             HEIGHT//4 - line * ((ALIEN_HEIGHT + ALIEN_PADDING)),
-             ALIEN_WIDTH, ALIEN_HEIGHT))
-
-    return aliens
-
-
-# Alien bullet firing function
-bullets = []
-def fire_bullet(alien):
-    b = pygame.Rect(alien.x + ALIEN_WIDTH//2 - ALIEN_BULLET_WIDTH//2,
-     alien.y + ALIEN_HEIGHT, ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT)
-    bullets.append(b)
-
-# Screen updating function
-def draw_screen(background, ship, aliens, lasers, bullets, lives, end_state):
-    lives_display = txt_font.render('LIVES: ' + str(lives), False, WHITE)
-    
-    WIN.blit(BACKGROUND, (background.x, background.y % BACKGROUND_HEIGHT))
-    WIN.blit(BACKGROUND, (background.x, (background.y % BACKGROUND_HEIGHT) - BACKGROUND_HEIGHT))
-    WIN.blit(SHIP1, (ship.x, ship.y))
-    for a in aliens:
-        WIN.blit(ALIEN, (a.x, a.y))
-    for l in lasers:
-        WIN.blit(SHIP_LASER, (l.x, l.y))
-    for b in bullets:
-        WIN.blit(ALIEN_BULLET, (b.x, b.y))
-
-    WIN.blit(lives_display, (10, 10))
-    if end_state == 'win':
-        WIN.blit(YOU_WIN, ((WIDTH - YOU_WIN.get_width())//2, (HEIGHT - YOU_WIN.get_height())//2))
-    elif end_state == 'lose':
-        WIN.blit(YOU_LOSE, ((WIDTH - YOU_LOSE.get_width())//2, (HEIGHT - YOU_LOSE.get_height())//2))
-
-    pygame.display.update()
-
-    if end_state == 'win' or end_state == 'lose':
-        wait = True
-        while wait:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    wait = False
-                    pygame.quit()
-
-
+# Code-wide tools
 clock = pygame.time.Clock()
 r_gen = random.Random()
 
-def main():
-    # Initialization
-    ship = pygame.Rect(WIDTH//2 - SHIP_WIDTH//2, HEIGHT - 10 - SHIP_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT)
-    aliens = place_aliens(LEVEL)
-    alien_speed = ALIEN_SPEED
-    alien_step = ALIEN_STEP
-    background = pygame.Rect(BACKGROUND_START_W, BACKGROUND_START_H, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-    last_laser = 0
-    last_move = 0
-    last_bullet = 0
-    bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
-    lives = 3
-    end_state = ''
+class Ship():
+    def __init__(self):
+        self.rect = pygame.Rect(WIDTH//2 - SHIP_WIDTH//2, HEIGHT - 10 - SHIP_HEIGHT, SHIP_WIDTH, SHIP_HEIGHT)
+        self.last_laser = 0
+        self.lasers = []
+        self.lives = 3
 
-    # Game Loop
-    running = True
-    while running:
-        clock.tick(FPS)
-        # Exit Condition
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
+    @property
+    def x(self):
+        return self.rect.x 
 
-        keys_pressed = pygame.key.get_pressed()
+    @x.setter
+    def x(self, val):
+        self.rect.x = val
 
-        if len(aliens) == 0:
-            running = False
-            end_state = 'win'
-            continue
+    @property
+    def y(self):
+        return self.rect.y
 
-        # Ship movements
+    @y.setter 
+    def y(self, val):
+        self.rect.y = val
+
+    # Ship movements
+    def movements(self, keys_pressed):
         if keys_pressed[pygame.K_LEFT]:
-            ship.x = max(ship.x - SHIP_SPEED, 0) # Border check left
+            self.x = max(self.x - SHIP_SPEED, 0) # Border check left
 
         if keys_pressed[pygame.K_RIGHT]:
-            ship.x = min(ship.x + SHIP_SPEED, WIDTH - SHIP_WIDTH) # border check right
+            self.x = min(self.x + SHIP_SPEED, WIDTH - SHIP_WIDTH) # border check right
 
 
         if keys_pressed[pygame.K_SPACE]:
-            if pygame.time.get_ticks() - last_laser > LASER_DELAY:
-                shoot_laser(ship, lasers)
-                last_laser = pygame.time.get_ticks()
+            if pygame.time.get_ticks() - self.last_laser > LASER_DELAY:
+                self.shoot_laser()
+                self.last_laser = pygame.time.get_ticks()
 
-        # At a random time, random alien fires bullet
-        if pygame.time.get_ticks() > last_bullet + bullet_timer:
-            fire_bullet(aliens[r_gen.randint(0, len(aliens) - 1)])
-            last_bullet = pygame.time.get_ticks()
-            bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
+    # Ship Firing function
+    def shoot_laser(self): # Will not shoot more than 3 lasers at a time, one at a second
+        if len(self.lasers) >= MAX_LASERS:
+            return
+        else:
+            l = Laser(self)
+            pygame.mixer.Sound.play(LASER_NOISE)
+            self.lasers.append(l)
 
 
-        # Alien movements
-        if pygame.time.get_ticks() - last_move > alien_speed:
+class Laser():
+    def __init__(self, ship):
+        self.rect = pygame.Rect(ship.x + SHIP_WIDTH//2 - SHIP_LASER_WIDTH//2,
+            ship.y - SHIP_LASER_HEIGHT,
+            SHIP_LASER_WIDTH, SHIP_LASER_HEIGHT)
+
+    @property
+    def x(self):
+        return self.rect.x 
+
+    @x.setter
+    def x(self, val):
+        self.rect.x = val
+
+    @property
+    def y(self):
+        return self.rect.y
+
+    @y.setter 
+    def y(self, val):
+        self.rect.y = val
+
+
+class Alien():
+    bullets = []
+
+    def __init__(self, start_x, start_y):
+        self.rect = pygame.Rect(start_x, start_y, ALIEN_WIDTH, ALIEN_HEIGHT)
+
+    @property 
+    def x(self):
+        return self.rect.x 
+
+    @x.setter
+    def x(self, val):
+        self.rect.x = val
+
+    @property
+    def y(self):
+        return self.rect.y
+
+    @y.setter 
+    def y(self, val):
+        self.rect.y = val
+
+    @classmethod
+    def add_bullet(cls, b):
+        cls.bullets.append(b)
+
+    # Alien bullet firing function
+    def fire_bullet(self):
+        b = Bullet(self)
+        Alien.add_bullet(b)
+
+
+class Bullet():
+    def __init__(self, alien):
+        self.rect = pygame.Rect(alien.x + ALIEN_WIDTH//2 - ALIEN_BULLET_WIDTH//2,
+                    alien.y + ALIEN_HEIGHT, 
+                    ALIEN_BULLET_WIDTH, ALIEN_BULLET_HEIGHT)
+
+    @property 
+    def x(self):
+        return self.rect.x 
+
+    @x.setter
+    def x(self, val):
+        self.rect.x = val
+
+    @property
+    def y(self):
+        return self.rect.y
+
+    @y.setter 
+    def y(self, val):
+        self.rect.y = val
+
+
+class Game():
+    # Window Setup
+    WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.font.init()
+    TXT_FONT = pygame.font.SysFont('Times New Romans', 25)
+    pygame.display.set_caption('Vace Inspaders')
+    pygame.display.set_icon(SHIP1)
+
+    def __init__(self):
+        self.ship = Ship()
+        self.aliens = self.place_aliens(LEVEL)
+        self.alien_speed = ALIEN_SPEED
+        self.alien_step = ALIEN_STEP
+        self.background = pygame.Rect(BACKGROUND_START_W, BACKGROUND_START_H, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        self.last_move = 0
+        self.last_bullet = 0
+        self.bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
+        self.end_state = ''
+
+    # Aliens initial setup
+    def place_aliens(self, nb_lines):
+        aliens = []
+        aliens_per_line = WIDTH//(ALIEN_WIDTH + ALIEN_PADDING) - 1
+        for line in range(nb_lines):
+            for col in range(aliens_per_line):
+                aliens.append(Alien(col * (ALIEN_PADDING + ALIEN_WIDTH),
+                HEIGHT//4 - line * (ALIEN_HEIGHT + ALIEN_PADDING)))
+
+        return aliens
+
+    # Alien movements
+    def alien_movements(self):
+        if pygame.time.get_ticks() - self.last_move > self.alien_speed:
             # Alien touches the ship
-            for a in aliens:
-                if a.colliderect(ship):
+            for a in self.aliens:
+                if a.rect.colliderect(self.ship):
                     running = False
                     continue
 
             # Last alien decides of the bounce on screen border
-            if max(map(lambda x: x.x, aliens)) + ALIEN_WIDTH + alien_step > WIDTH:
-                alien_step *= -1
-                alien_speed = max(ALIEN_SPEED//10, alien_speed - ALIEN_SPEED//10)
-                for alien in aliens:
+            if max(map(lambda x: x.x, self.aliens)) + ALIEN_WIDTH + self.alien_step > WIDTH:
+                self.alien_step *= -1
+                self.alien_speed = max(ALIEN_SPEED//10, self.alien_speed - ALIEN_SPEED//10)
+                for alien in self.aliens:
                     alien.y += ALIEN_STEP
 
-            elif min(map(lambda x: x.x, aliens)) + alien_step < 0:
-                alien_step *= -1
-                alien_speed = max(ALIEN_SPEED//10, alien_speed - ALIEN_SPEED//10)
-                for alien in aliens:
+            elif min(map(lambda x: x.x, self.aliens)) + self.alien_step < 0:
+                self.alien_step *= -1
+                self.alien_speed = max(ALIEN_SPEED//10, self.alien_speed - ALIEN_SPEED//10)
+                for alien in self.aliens:
                     alien.y += ALIEN_STEP
 
             else:
-                for alien in aliens:
-                    alien.x += alien_step
+                for alien in self.aliens:
+                    alien.x += self.alien_step
         
-            last_move = pygame.time.get_ticks()
+            self.last_move = pygame.time.get_ticks()
 
-        
-    # Projectiles movements
-        # Ship lasers
-        for l in lasers: # Out of bounds
+    # At a random time, random alien fires bullet -> will go in game class
+    def alien_fire(self):
+        if pygame.time.get_ticks() > self.last_bullet + self.bullet_timer:
+            self.aliens[r_gen.randint(0, len(self.aliens) - 1)].fire_bullet()
+            self.last_bullet = pygame.time.get_ticks()
+            self.bullet_timer = r_gen.randint(MIN_BULLET_WAIT, MAX_BULLET_WAIT)
+
+    # Ship lasers
+    def laser_movements(self):
+        for l in self.ship.lasers: # Out of bounds
             if l.y + SHIP_LASER_HEIGHT == 0:
-                lasers.remove(l)
+                self.ship.lasers.remove(l)
                 continue
 
-            for a in aliens: # Hits alien
-                if l.colliderect(a):
-                    aliens.remove(a)
-                    lasers.remove(l)
+            for a in self.aliens: # Hits alien
+                if l.rect.colliderect(a):
+                    self.aliens.remove(a)
+                    self.ship.lasers.remove(l)
                     pygame.mixer.Sound.play(EXPLOSION)
                     continue
 
             l.y -= LASER1_SPEED # Laser progression
 
-        # Alien Bullets
-        for b in bullets:
-            if b.colliderect(ship):
-                lives -= 1
-                bullets.remove(b)
+    # Alien Bullets
+    def bullet_movements(self):
+        for b in Alien.bullets:
+            if b.rect.colliderect(self.ship):
+                self.ship.lives -= 1
+                Alien.bullets.remove(b)
 
-            if lives == 0:
+            if self.ship.lives == 0:
                 running = False
-                end_state = 'lose'
+                self.end_state = 'lose'
                 continue
 
             b.y += LASER1_SPEED
 
-        background.y += BACKGROUND_SPEED # Scrolls background
-        draw_screen(background, ship, aliens, lasers, bullets, lives, end_state) # Update screen
-    
-    draw_screen(background, ship, aliens, lasers, bullets, lives, end_state) # End of game
+    # Screen updating function
+    def draw_screen(self):
+        lives_display = self.TXT_FONT.render('LIVES: ' + str(self.ship.lives), False, WHITE)
+        
+        self.WIN.blit(BACKGROUND, (self.background.x, self.background.y % BACKGROUND_HEIGHT))
+        self.WIN.blit(BACKGROUND, (self.background.x, (self.background.y % BACKGROUND_HEIGHT) - BACKGROUND_HEIGHT))
+        self.WIN.blit(SHIP1, (self.ship.x, self.ship.y))
+        for a in self.aliens:
+            self.WIN.blit(ALIEN, (a.x, a.y))
+        for l in self.ship.lasers:
+            self.WIN.blit(SHIP_LASER, (l.x, l.y))
+        for b in Alien.bullets:
+            self.WIN.blit(ALIEN_BULLET, (b.x, b.y))
+
+        self.WIN.blit(lives_display, (10, 10))
+        if self.end_state == 'win':
+            self.WIN.blit(YOU_WIN, ((WIDTH - YOU_WIN.get_width())//2, (HEIGHT - YOU_WIN.get_height())//2))
+        elif self.end_state == 'lose':
+            self.WIN.blit(YOU_LOSE, ((WIDTH - YOU_LOSE.get_width())//2, (HEIGHT - YOU_LOSE.get_height())//2))
+
+        pygame.display.update()
+
+        if self.end_state == 'win' or self.end_state == 'lose':
+            wait = True
+            while wait:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        wait = False
+
+
+    def run_game(self):
+
+        # Game Loop
+        running = True
+        while running:
+            clock.tick(FPS)
+            # Exit Condition
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+
+            keys_pressed = pygame.key.get_pressed()
+
+            if len(self.aliens) == 0:
+                running = False
+                self.end_state = 'win'
+                continue
+
+            self.ship.movements(keys_pressed)
+
+            self.alien_fire()
+
+            self.alien_movements()
+
+            self.laser_movements()
+
+            self.bullet_movements()
+            
+            if self.end_state == 'lose':
+                continue
+
+            self.background.y += BACKGROUND_SPEED # Scrolls background
+            self.draw_screen() # Update screen
+        
+        self.draw_screen() # End of game
+        pygame.quit()
 
 
 if __name__ == '__main__':
-    main()
+    g = Game()
+    g.run_game()

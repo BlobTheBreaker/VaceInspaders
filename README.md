@@ -29,3 +29,10 @@ Creation of the PvPVaceInspader.py file to work on the pvp version without break
 - Started defining classes to clarify the code
 - Imported Network to have a n instance as an attribute for the player
 - Added a second ship surface rotated 180 deg for ennemy player
+
+22/01/2022:
+After 3 attempts at refactoring, realized that this process has to be very procedural and slow paced: you create one class,
+make it's __init__ and test it. Then add a couple methods and test it. Then you move on to another class.
+
+- The code is now fully (from what i understand of it) OOP
+- Now is the time to add some networking to it!
