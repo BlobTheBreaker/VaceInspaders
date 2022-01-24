@@ -10,6 +10,18 @@ Controls are left/right/space.
 
 LOGS:
 
+24/01/2022:
+After posting this repo on Reddit r/pygame, i got some very constructive feedback (mostly concerning my OOP version).
+I followed some of those suggestions and the code, although not yet operationnal, is now a lot cleaner. I made the following changes:
+
+- Created a superclass Entity (subclass of pygame.Rect) to handle instantiating every collidable (is that a word?) entities.
+- Moved the movements from Game to their respective classes
+- Moved a lot of globals to their respective classes (or deleted some that were unused or only used once)
+
+There is still work to be done but i can see these changes being completed on my next coding session!
+
+---------------------------------------------------------------------------------------------------------------
+
 23/01/2022:
 The client connects to the server and waits for another client to connect to launch the game.
 I discovered, while coding the server side, that threading creates 2 separate subrocesses that
@@ -23,6 +35,7 @@ simultaneously
 I realize that the server might only act as a bridge for now. I will move some game functionnalities
 to the server side eventually to lighten the weight on the client side.
 
+---------------------------------------------------------------------------------------------------------------
 
 22/01/2022:
 After 3 attempts at refactoring, realized that this process has to be very procedural and slow paced: you create one class,
@@ -31,6 +44,7 @@ make it's __init__ and test it. Then add a couple methods and test it. Then you 
 - The code is now fully (from what i understand of it) OOP
 - Now is the time to add some networking to it!
 
+---------------------------------------------------------------------------------------------------------------
 
 21/01/2022:
 Creation of the PvPVaceInspader.py file to work on the pvp version without breaking the original game.
@@ -39,6 +53,7 @@ Creation of the PvPVaceInspader.py file to work on the pvp version without break
 - Imported Network to have a n instance as an attribute for the player
 - Added a second ship surface rotated 180 deg for ennemy player
 
+---------------------------------------------------------------------------------------------------------------
 
 20/01/2022:
 The game has 1 level, some sound effects, Winning and Losing ending.
