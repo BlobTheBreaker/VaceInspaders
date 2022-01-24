@@ -25,10 +25,7 @@ FPS = 60
 
 # Background image
 # BACKGROUND = pygame.image.load(os.path.join('Assets', 'alien_2.png'))
-BACKGROUND_IMAGE = pygame.image.load(os.path.join('Assets', 'background.jpg'))
-BACKGROUND = pygame.transform.rotate(BACKGROUND_IMAGE, 90)
-BACKGROUND_WIDTH, BACKGROUND_HEIGHT = BACKGROUND.get_size()
-BACKGROUND_START_W, BACKGROUND_START_H = (-(BACKGROUND_WIDTH - WIN_WIDTH)//2, -(BACKGROUND_HEIGHT - WIN_HEIGHT)//2)
+
 
 # Win text
 YOU_WIN_IMAGE = pygame.image.load(os.path.join('Assets', 'you_win.png'))
@@ -49,9 +46,15 @@ LEVEL = 4
 
 # Generic entity class that subclasses Rect and superclasses all objects that need a rect.
 class Entity(pygame.Rect):
-    def __init__(self, x, y, width, heigth, img_path) -> None:
-        super.__init__(self, x, y, width, heigth)
-        self.image = pygame.image.load(img_path), 
+    def __init__(self, x, y, width, height, img_path) -> None:
+
+        self.image = pygame.image.load(img_path)
+
+        if width == 0 and height == 0:
+            width, height = self.image.get_size()
+
+        super.__init__(self, x, y, width, height)
+        
         
 
 class Ship(Entity):
@@ -208,6 +211,13 @@ class Bullet():
             b.y += self.SPEED
 
 
+class Background(Entity):
+    def __init__(self) -> None:
+        super.__init__(self, 0, 0, 0, 0, os.path.join('Assets', 'background.jpg'))
+        self.image = pygame.transform.rotate(self.image, 90)
+        self.WIDTH, self.HEIGHT = self.image.get_size()
+        self.x, self.y = (-(self.WIDTH - WIN_WIDTH)//2, -(self.HEIGHT - WIN_HEIGHT)//2)
+
 class Game():
     # Window Setup
     def __init__(self):
@@ -219,7 +229,7 @@ class Game():
         self.clock = pygame.time.Clock()
         self.ship = Ship(WIN_WIDTH//2, WIN_HEIGHT - 20) # center, center.
         self.aliens = Alien.place_aliens(LEVEL)
-        self.background = pygame.Rect(BACKGROUND_START_W, BACKGROUND_START_H, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+        self.background = Background()
         self.end_state = ''
 
 
