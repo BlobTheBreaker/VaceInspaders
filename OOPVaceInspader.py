@@ -6,10 +6,8 @@ TO DO LIST:
 OOP Version:
 
 x Make everything OOP...
-- Start networking part!
 """
 
-from typing import overload
 import pygame
 import os
 import random
@@ -56,7 +54,7 @@ class Ship(Entity):
             self.right = min(self.right + self.SPEED, WIN_WIDTH) # border check right
         if keys_pressed[pygame.K_SPACE]:
             if (pygame.time.get_ticks() - self.last_laser > 300 
-            and len(self.lasers) <= 3): # laser delay between shots in ms and maximum laser entities alive
+            and len(self.lasers) < 3): # laser delay between shots in ms and maximum laser entities alive
                 self.shoot_laser()
                 self.last_laser = pygame.time.get_ticks() 
 
