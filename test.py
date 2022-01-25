@@ -1,6 +1,4 @@
-from re import A
+a = []
 
-
-a = [1, 2, 3]
-b, c, d = a
-print(b, c, d)
+for i in a:
+    print(1)

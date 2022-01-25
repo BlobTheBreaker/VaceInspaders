@@ -10,6 +10,12 @@ Controls are left/right/space.
 
 LOGS:
 
+25/01/2022:
+The refactoring seems complete appart from one little annoyance (see Alien class constants)
+It works and is full OOP! Now ready to work on the PvP version :D
+
+---------------------------------------------------------------------------------------------------------------
+
 24/01/2022:
 After posting this repo on Reddit r/pygame, i got some very constructive feedback (mostly concerning my OOP version).
 I followed some of those suggestions and the code, although not yet operationnal, is now a lot cleaner. I made the following changes:
