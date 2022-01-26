@@ -8,6 +8,7 @@ OOP Version:
 x Make everything OOP...
 """
 
+from html import entities
 import pygame
 import os
 import random
@@ -31,6 +32,10 @@ class Entity(pygame.Rect):
 
     def draw(self):
         WIN.blit(self.image, self.topleft)
+
+
+    def to_str(self):
+        return '{}, {}, {}, {}, '.format(self.x, self.y, self.width, self.height)
 
 
 class Ship(Entity):
@@ -91,6 +96,11 @@ class Laser(Entity):
                     continue
             l.y -= cls.SPEED # Laser progression
 
+
+class Ennemy(Entity):
+    def __init__(self, x, y, width, height, img_path) -> None:
+        super().__init__(x, y, width, height, img_path)
+        self.center = self.x, self.y
 
 class Alien(Entity):
     #I need to fix those. Most are here because my classmethods access them...
@@ -221,9 +231,33 @@ class Game():
         self.ship = Ship(WIN_WIDTH//2, WIN_HEIGHT - 20) # center, center.
         self.aliens = Alien.place_aliens(self.LEVEL) #
         self.background = Background()
+        self.ennemy = Ennemy(WIN_WIDTH//2, 20)
         self.game_state = 'running'
         pygame.display.set_caption('Vace Inspaders')
         pygame.display.set_icon(self.ship.image)
+
+
+    def pack_data(self):
+        data_str = ''
+        for ent in self.local_entities:
+            if type(ent) == list:
+                for obj in ent:
+                    data_str += obj.to_str() + ','
+            else:
+                data_str += obj.to_str() + ','
+
+        return data_str
+
+    def unpack_data(self, data_str):
+        data = data_str.split(',')
+        for ent in self.ennemy_entities:
+            ent.x, ent.y = data
+            
+
+
+    
+    def unpack_data(self):
+        pass
 
 
     # Screen updating function
@@ -237,6 +271,7 @@ class Game():
         self.lives_display = self.TXT_FONT.render('LIVES: ' + str(self.ship.lives), False, (255, 255, 255))
         WIN.blit(self.lives_display, (10, 10))
         pygame.display.update()
+
 
     def draw_end(self):
         if self.game_state == 'win':

@@ -1,4 +1,5 @@
-a = []
+from re import A
 
-for i in a:
-    print(1)
+
+a, b, c, d = '1', '2', '3', '4'
+print('{}, {}, {}, {}, '.format(a, b, c, d))
